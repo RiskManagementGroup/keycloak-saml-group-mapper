@@ -23,6 +23,13 @@
 
 package dk.rmgroup.keycloak.broker.saml.mappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import org.keycloak.broker.provider.BrokeredIdentityContext;
 import org.keycloak.broker.provider.ConfigConstants;
 import org.keycloak.broker.saml.SAMLEndpoint;
@@ -37,50 +44,47 @@ import org.keycloak.models.IdentityProviderMapperModel;
 import org.keycloak.models.IdentityProviderSyncMode;
 import org.keycloak.protocol.saml.mappers.SamlMetadataDescriptorUpdater;
 import org.keycloak.provider.ProviderConfigProperty;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import static org.keycloak.saml.common.constants.JBossSAMLURIConstants.ATTRIBUTE_FORMAT_BASIC;
 
 /**
  * Original @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
+ * 
  * @version $Revision: 1 $
  */
 public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper implements SamlMetadataDescriptorUpdater {
 
-    public static final String[] COMPATIBLE_PROVIDERS = {SAMLIdentityProviderFactory.PROVIDER_ID};
+    public static final String[] COMPATIBLE_PROVIDERS = { SAMLIdentityProviderFactory.PROVIDER_ID };
 
-    private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
+    private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
     public static final String ATTRIBUTE_NAME = "attribute.name";
     public static final String ATTRIBUTE_FRIENDLY_NAME = "attribute.friendly.name";
     public static final String ATTRIBUTE_VALUE = "attribute.value";
 
-    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES = new HashSet<>(Arrays.asList(IdentityProviderSyncMode.values()));
+    private static final Set<IdentityProviderSyncMode> IDENTITY_PROVIDER_SYNC_MODES = new HashSet<>(
+            Arrays.asList(IdentityProviderSyncMode.values()));
 
     static {
         ProviderConfigProperty property;
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_NAME);
         property.setLabel("Attribute Name");
-        property.setHelpText("Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
+        property.setHelpText(
+                "Name of attribute to search for in assertion.  You can leave this blank and specify a friendly name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_FRIENDLY_NAME);
         property.setLabel("Friendly Name");
-        property.setHelpText("Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
+        property.setHelpText(
+                "Friendly name of attribute to search for in assertion.  You can leave this blank and specify a name instead.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
         property.setName(ATTRIBUTE_VALUE);
         property.setLabel("Attribute Value");
-        property.setHelpText("Value the attribute must have.  If the attribute is a list, then the value must be contained in the list.");
+        property.setHelpText(
+                "Value the attribute must have.  If the attribute is a list, then the value must be contained in the list.");
         property.setType(ProviderConfigProperty.STRING_TYPE);
         configProperties.add(property);
         property = new ProviderConfigProperty();
@@ -123,18 +127,23 @@ public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper imple
         return "SAML Attribute to Group";
     }
 
+    @Override
     protected boolean applies(final IdentityProviderMapperModel mapperModel, final BrokeredIdentityContext context) {
         String name = mapperModel.getConfig().get(ATTRIBUTE_NAME);
-        if (name != null && name.trim().equals("")) name = null;
+        if (name != null && name.trim().equals(""))
+            name = null;
         String friendly = mapperModel.getConfig().get(ATTRIBUTE_FRIENDLY_NAME);
-        if (friendly != null && friendly.trim().equals("")) friendly = null;
+        if (friendly != null && friendly.trim().equals(""))
+            friendly = null;
         String desiredValue = Optional.ofNullable(mapperModel.getConfig().get(ATTRIBUTE_VALUE)).orElse("");
-        AssertionType assertion = (AssertionType)context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
+        AssertionType assertion = (AssertionType) context.getContextData().get(SAMLEndpoint.SAML_ASSERTION);
         for (AttributeStatementType statement : assertion.getAttributeStatements()) {
             for (AttributeStatementType.ASTChoiceType choice : statement.getAttributes()) {
                 AttributeType attr = choice.getAttribute();
-                if (name != null && !name.equals(attr.getName())) continue;
-                if (friendly != null && !friendly.equals(attr.getFriendlyName())) continue;
+                if (name != null && !name.equals(attr.getName()))
+                    continue;
+                if (friendly != null && !friendly.equals(attr.getFriendlyName()))
+                    continue;
                 for (Object val : attr.getAttributeValue()) {
                     val = Optional.ofNullable(val).orElse("");
                     if (val.equals(desiredValue))
@@ -156,7 +165,8 @@ public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper imple
         String attributeName = mapperModel.getConfig().get(ATTRIBUTE_NAME);
         String attributeFriendlyName = mapperModel.getConfig().get(ATTRIBUTE_FRIENDLY_NAME);
 
-        RequestedAttributeType requestedAttribute = new RequestedAttributeType(mapperModel.getConfig().get(ATTRIBUTE_NAME));
+        RequestedAttributeType requestedAttribute = new RequestedAttributeType(
+                mapperModel.getConfig().get(ATTRIBUTE_NAME));
         requestedAttribute.setIsRequired(null);
         requestedAttribute.setNameFormat(ATTRIBUTE_FORMAT_BASIC.get());
 
@@ -164,14 +174,15 @@ public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper imple
             requestedAttribute.setFriendlyName(attributeFriendlyName);
 
         // Add the requestedAttribute item to any AttributeConsumingServices
-        for (EntityDescriptorType.EDTChoiceType choiceType: entityDescriptor.getChoiceType()) {
+        for (EntityDescriptorType.EDTChoiceType choiceType : entityDescriptor.getChoiceType()) {
             List<EntityDescriptorType.EDTDescriptorChoiceType> descriptors = choiceType.getDescriptors();
-            for (EntityDescriptorType.EDTDescriptorChoiceType descriptor: descriptors) {
-                for (AttributeConsumingServiceType attributeConsumingService: descriptor.getSpDescriptor().getAttributeConsumingService())
-                {
+            for (EntityDescriptorType.EDTDescriptorChoiceType descriptor : descriptors) {
+                for (AttributeConsumingServiceType attributeConsumingService : descriptor.getSpDescriptor()
+                        .getAttributeConsumingService()) {
                     boolean alreadyPresent = attributeConsumingService.getRequestedAttribute().stream()
-                        .anyMatch(t -> (attributeName == null || attributeName.equalsIgnoreCase(t.getName())) &&
-                                       (attributeFriendlyName == null || attributeFriendlyName.equalsIgnoreCase(t.getFriendlyName())));
+                            .anyMatch(t -> (attributeName == null || attributeName.equalsIgnoreCase(t.getName())) &&
+                                    (attributeFriendlyName == null
+                                            || attributeFriendlyName.equalsIgnoreCase(t.getFriendlyName())));
 
                     if (!alreadyPresent)
                         attributeConsumingService.addRequestedAttribute(requestedAttribute);
