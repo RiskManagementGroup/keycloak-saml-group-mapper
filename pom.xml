@@ -5,7 +5,7 @@
 
   <groupId>dk.rmgroup.keycloak</groupId>
   <artifactId>saml-group-mapper</artifactId>
-  <version>23.0.7</version>
+  <version>24.0.5</version>
 
   <name>saml-group-mapper</name>
   <!-- FIXME change it to the project's website -->
@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <keycloak.version>23.0.7</keycloak.version>
+    <keycloak.version>24.0.5</keycloak.version>
   </properties>
 
   <dependencies>
