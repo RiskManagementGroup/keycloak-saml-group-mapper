@@ -53,7 +53,7 @@ import static org.keycloak.saml.common.constants.JBossSAMLURIConstants.ATTRIBUTE
  */
 public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper implements SamlMetadataDescriptorUpdater {
 
-    public static final String[] COMPATIBLE_PROVIDERS = { SAMLIdentityProviderFactory.PROVIDER_ID };
+    protected static final String[] COMPATIBLE_PROVIDERS = { SAMLIdentityProviderFactory.PROVIDER_ID };
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<>();
 
@@ -170,7 +170,7 @@ public class AttributeToGroupMapper extends AbstractAttributeToGroupMapper imple
         requestedAttribute.setIsRequired(null);
         requestedAttribute.setNameFormat(ATTRIBUTE_FORMAT_BASIC.get());
 
-        if (attributeFriendlyName != null && attributeFriendlyName.length() > 0)
+        if (attributeFriendlyName != null && !attributeFriendlyName.isEmpty())
             requestedAttribute.setFriendlyName(attributeFriendlyName);
 
         // Add the requestedAttribute item to any AttributeConsumingServices
