@@ -1,1 +1,2 @@
 dk.rmgroup.keycloak.broker.saml.mappers.AttributeToGroupMapper
+dk.rmgroup.keycloak.broker.saml.mappers.Base64DecodeAttributeToGroupMapper
